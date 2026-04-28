@@ -208,23 +208,6 @@ def fetch_todos(url: str, key: str) -> list[dict]:
         return []
 
 
-def fetch_astrid_blurb(url: str, key: str) -> str:
-    if not url or not key:
-        return ""
-    req = urllib.request.Request(
-        f"{url}/rest/v1/person_blurbs?person_name=eq.Astrid&select=blurb,updated_at&limit=1",
-        headers={"apikey": key, "Authorization": f"Bearer {key}"}
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            rows = json.loads(resp.read())
-        if rows:
-            print(f"  ✓ blurb fetched")
-            return rows[0]["blurb"]
-    except Exception as e:
-        print(f"  ✗ blurb: {e}")
-    return ""
-
 def format_todos(todos: list[dict]) -> str:
     if not todos:
         return "No pending todos."
@@ -337,7 +320,7 @@ def markdown_to_html(text: str) -> str:
         html_lines.append("</ul>")
     return "\n".join(html_lines)
 
-def build_html_email(calendar_md: str, todos_md: str, news_md: str, blurb: str = "") -> str:
+def build_html_email(calendar_md: str, todos_md: str, news_md: str) -> str:
     today_str = date.today().strftime("%A, %d %B %Y")
 
     def card(icon, title, body_html):
@@ -359,7 +342,6 @@ def build_html_email(calendar_md: str, todos_md: str, news_md: str, blurb: str =
   </div>
   {card("📅", "Today", markdown_to_html(calendar_md))}
   {card("✅", "Admin Blocks", markdown_to_html(todos_md))}
-  {card("💬", "Your Todos", f'<p style="margin:0 0 10px;font-style:italic;color:#adbac7">{blurb}</p>' if blurb else "")}
   {card("📰", "News", markdown_to_html(news_md))}
   <p style="font-size:11px;color:#7d8590;text-align:center;margin-top:20px">
     Generated {datetime.now().strftime("%H:%M")} · morning-briefing
@@ -388,7 +370,6 @@ def main():
 
     news   = fetch_all_news()
     todos  = fetch_todos(cfg["supabase_url"], cfg["supabase_key"])
-    blurb  = fetch_astrid_blurb(cfg["supabase_url"], cfg["supabase_key"])
     events = fetch_todays_events(cfg)
 
     todos_text = format_todos(todos)
@@ -400,7 +381,7 @@ def main():
     print("\n--- TODOS ---\n", sections["todos"])
     print("\n--- NEWS (truncated) ---\n", sections["news"][:300])
 
-    html = build_html_email(sections["calendar"], sections["todos"], sections["news"], blurb)
+    html = build_html_email(sections["calendar"], sections["todos"], sections["news"])
     send_email(html, cfg)
     print("\nDone.")
 
