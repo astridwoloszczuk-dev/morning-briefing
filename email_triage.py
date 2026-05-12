@@ -160,8 +160,9 @@ One word answer:"""
 
 # ── MAIN ──────────────────────────────────────────────────────────────────────
 
-def main():
-    print(f"── Email Triage {datetime.now().strftime('%Y-%m-%d %H:%M')} ──")
+def main(dry_run=False):
+    mode = "DRY RUN" if dry_run else "LIVE"
+    print(f"── Email Triage {datetime.now().strftime('%Y-%m-%d %H:%M')} [{mode}] ──")
 
     token = get_token()
 
@@ -191,11 +192,13 @@ def main():
                 method   = "AI"
 
             if decision == "DELETE":
-                move_message(token, msg_id, check_id)
+                if not dry_run:
+                    move_message(token, msg_id, check_id)
                 counts["delete"] += 1
                 print(f"  🗑  [{method}] {subject[:70]}")
             elif decision == "ARCHIVE":
-                move_message(token, msg_id, archive_id)
+                if not dry_run:
+                    move_message(token, msg_id, archive_id)
                 counts["archive"] += 1
                 print(f"  📁  [{method}] {subject[:70]}")
             else:
@@ -218,4 +221,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(dry_run="--dry-run" in sys.argv)
