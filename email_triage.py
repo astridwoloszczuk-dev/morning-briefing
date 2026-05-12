@@ -19,7 +19,7 @@ TOKEN_PATH   = SCRIPT_DIR / "ms_token.json"
 GRAPH_BASE   = "https://graph.microsoft.com/v1.0"
 TOKEN_URL    = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
 OLLAMA_URL   = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3.2"
+OLLAMA_MODEL = "qwen2.5:72b"
 
 CHECK_FOLDER = "Check to Delete"
 
@@ -104,7 +104,16 @@ ARCHIVE_SUBJECT = [
     "your package", "has been delivered", "tracking number",
     "booking confirmation", "reservation confirmation", "e-ticket",
     "registration confirmed", "password reset", "verify your email",
-    "welcome to", "your account",
+    "welcome to", "your account", "your booking", "booking reference",
+    "flight confirmation", "booking code", "itinerary", "your trip",
+    "your reservation", "appointment confirmation", "your appointment",
+    "reimbursement", "claim", "diagnosis", "medical", "prescription",
+    "insurance", "policy", "your policy", "google play", "app store",
+    "your invoice", "your receipt", "your statement", "your bill",
+    "direct debit", "standing order", "bank statement",
+    "holiday", "camp", "school", "kindergarten",
+    "welcome", "your new account", "energy", "electricity", "gas",
+    "ukvi", "visa", "passport", "government",
 ]
 
 
@@ -132,9 +141,11 @@ def rules_classify(subject, sender_email, preview):
 def ollama_classify(subject, sender, preview):
     prompt = f"""Classify this email. Reply with exactly one word only: INBOX, ARCHIVE, or DELETE.
 
-INBOX = personal email, requires action or reply, important information
-ARCHIVE = receipt, notification, confirmation, automatically generated but harmless
-DELETE = marketing, newsletter, promotion, advertisement, spam
+INBOX = personal email, requires action or reply, customer service issue, official/government email, anything with unresolved issues, anything sent directly to the recipient
+ARCHIVE = receipt, invoice, booking confirmation, medical document, insurance document, payment confirmation, bank statement, school/camp info, welcome email from a service, anything that might be needed later
+DELETE = pure marketing, newsletter, promotion, advertisement, discount offer, mass-sent promotional email with no personal or transactional content
+
+When in doubt, choose ARCHIVE over DELETE. Only choose DELETE if you are certain it is promotional/marketing with no useful content.
 
 Sender: {sender}
 Subject: {subject}
