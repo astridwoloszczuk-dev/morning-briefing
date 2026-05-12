@@ -15,7 +15,7 @@ SCRIPT_DIR = Path(__file__).parent
 ENV_PATH   = SCRIPT_DIR / ".env"
 TOKEN_PATH = SCRIPT_DIR / "ms_token.json"
 
-SCOPES = "Calendars.Read User.Read offline_access"
+SCOPES = "Calendars.Read User.Read Mail.Read Mail.ReadWrite offline_access"
 AUTH_URL  = "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize"
 TOKEN_URL = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
 

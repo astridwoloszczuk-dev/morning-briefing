@@ -108,7 +108,7 @@ def refresh_ms_token(token: dict, cfg: dict) -> dict:
         "client_secret": cfg["ms_client_secret"],
         "refresh_token": token["refresh_token"],
         "grant_type":    "refresh_token",
-        "scope":         "Calendars.Read User.Read offline_access",
+        "scope":         "Calendars.Read User.Read Mail.Read Mail.ReadWrite offline_access",
     }).encode()
     req = urllib.request.Request(TOKEN_URL, data=data, method="POST")
     req.add_header("Content-Type", "application/x-www-form-urlencoded")
