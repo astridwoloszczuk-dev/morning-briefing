@@ -161,7 +161,7 @@ One word answer:"""
     }).encode()
     req = urllib.request.Request(OLLAMA_URL, data=data)
     req.add_header("Content-Type", "application/json")
-    with urllib.request.urlopen(req, timeout=30) as r:
+    with urllib.request.urlopen(req, timeout=120) as r:
         response = json.loads(r.read())["response"].strip().upper()
     for word in ["INBOX", "ARCHIVE", "DELETE"]:
         if word in response:
